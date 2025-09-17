@@ -48,3 +48,36 @@ bash
 Kodu kopyala
 sudo cp /etc/network/interfaces.bak.TARIH /etc/network/interfaces
 sudo systemctl restart networking
+
+1. SSH ile sunucuya bağlan
+ssh KULLANICI_ADI@SUNUCU_IP
+
+2. Script’i indir
+wget https://raw.githubusercontent.com/mzturk/network-tools/main/set_static_ip.sh -O set_static_ip.sh
+
+
+Alternatif:
+
+curl -o set_static_ip.sh https://raw.githubusercontent.com/mzturk/network-tools/main/set_static_ip.sh
+
+3. Çalıştırılabilir hale getir
+chmod +x set_static_ip.sh
+
+4. Script’i çalıştır
+
+Örnek:
+
+sudo ./set_static_ip.sh enp2s0 192.168.1.100 255.255.255.0 192.168.1.1 8.8.8.8
+
+5. Doğrula
+ip addr show enp2s0
+ip route
+cat /etc/network/interfaces
+
+
+⚠️ Uyarı:
+Bunu uzaktan (SSH) yapıyorsan ve yanlış IP/gateway girersen bağlantın düşebilir. O yüzden:
+
+Önce aynı subnet’ten doğru IP seçtiğine emin ol.
+
+Mümkünse konsol erişimi (örneğin sanal sunucularda panelden) yedek olsun.
