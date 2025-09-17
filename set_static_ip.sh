@@ -1,12 +1,10 @@
 #!/bin/bash
-# Debian - /etc/network/interfaces kullanarak statik IP ayarlama
-# Kullanım:
-# sudo ./set_static_ip.sh <interface> <ip_address> <netmask> <gateway> <dns1[,dns2,...]>
+# Debian - GitHub'dan statik IP ayarı (tek seferlik)
 
 set -e
 
 if [ "$EUID" -ne 0 ]; then
-  echo "❌ Bu script root yetkisiyle çalıştırılmalı (sudo)."
+  echo "❌ Root (sudo) yetkisiyle çalıştırılmalı."
   exit 1
 fi
 
@@ -22,14 +20,14 @@ NETMASK=$3
 GATEWAY=$4
 DNS=$5
 
-# Dosyanın yedeğini al
+# Eski dosyayı yedekle
 BACKUP="/etc/network/interfaces.bak.$(date +%Y%m%d%H%M%S)"
 cp /etc/network/interfaces "$BACKUP"
-echo "✅ Yedek alındı: $BACKUP"
+echo "✅ /etc/network/interfaces yedeklendi: $BACKUP"
 
-# Yeni ayarları yaz
+# Yeni konfigürasyonu yaz
 cat <<EOF > /etc/network/interfaces
-# Bu dosya otomatik olarak oluşturuldu: $(date)
+# /etc/network/interfaces - otomatik oluşturuldu: $(date)
 
 source /etc/network/interfaces.d/*
 
@@ -44,10 +42,12 @@ iface $IFACE inet static
     dns-nameservers $DNS
 EOF
 
-echo "✅ /etc/network/interfaces güncellendi."
+echo "✅ Yeni /etc/network/interfaces yazıldı."
 
-# Ağ servislerini yeniden başlat
+# Ağ servisini yeniden başlat
+echo "🔄 Ağ yeniden başlatılıyor..."
 systemctl restart networking || service networking restart
 
-echo ">>> Yeni IP bilgisi:"
+echo ">>> IP bilgisi:"
 ip addr show dev "$IFACE"
+ip route show
